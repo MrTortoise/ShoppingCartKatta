@@ -4,6 +4,7 @@
     {
         private int price;
         private string name;
+        private Promotion promotion;
 
         public int Price => price;
 
@@ -11,6 +12,11 @@
         {           
             this.name = name;
             this.price = price;
+        }
+
+        public Item(string name, int price, Promotion promotion) : this(name, price)
+        {
+            this.promotion = promotion;
         }
     }
 }

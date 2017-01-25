@@ -23,6 +23,21 @@ namespace ShoppingCart.Tests
             basket.AddItemToBasket(item2);
             Assert.That(basket.Total, Is.EqualTo(7));
         }
+
+        [Test]
+        public void AddItemsWithPromotion()
+        {
+            var item1 = new Item(Sku1, 50, new Promotion(3, 130));
+            var item2 = new Item(Sku2, 80);
+
+            var basket = new Basket();
+            basket.AddItemToBasket(item1);
+            basket.AddItemToBasket(item1);
+            basket.AddItemToBasket(item1);
+            basket.AddItemToBasket(item2);
+
+            Assert.That(basket.Total, Is.EqualTo(210));
+        }
         
     }
 }
