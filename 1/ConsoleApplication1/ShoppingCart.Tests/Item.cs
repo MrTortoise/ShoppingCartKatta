@@ -8,6 +8,9 @@
 
         public int Price => price;
 
+        public bool HasPromotion { get { return promotion != null; } }
+        public Promotion Promotion { get { return promotion; } }
+
         public Item(string name,int price)
         {           
             this.name = name;

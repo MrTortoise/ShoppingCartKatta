@@ -1,14 +1,21 @@
-﻿namespace ShoppingCart.Tests
+﻿using System;
+
+namespace ShoppingCart.Tests
 {
     internal class Promotion
     {
-        private int v1;
-        private int v2;
+        private int number;
+        private int price;
 
-        public Promotion(int v1, int v2)
+        public Promotion(int number, int price)
         {
-            this.v1 = v1;
-            this.v2 = v2;
+            this.number = number;
+            this.price = price;
+        }
+
+        internal int Apply(int quantity)
+        {
+            throw new NotImplementedException();
         }
     }
 }
