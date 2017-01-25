@@ -45,7 +45,7 @@ namespace ShoppingCart.Tests
             {
                 new BuyXGetY(itemSource.GetItemFromSku(Sku1),3,1)
             });
-            var thing = new Thing(itemSource,promotionSource);
+            var thing = new Thing(itemSource, promotionSource);
             thing.Scan(Sku1);
             thing.Scan(Sku1);
             thing.Scan(Sku1);
@@ -56,7 +56,7 @@ namespace ShoppingCart.Tests
         }
 
 
-}
+    }
     internal class BuyXGetY : IPromotion
     {
         private Item item;
@@ -72,7 +72,7 @@ namespace ShoppingCart.Tests
 
         public void Apply(Order order)
         {
-           
+            if ()
         }
     }
     internal interface IPromotion
@@ -82,7 +82,7 @@ namespace ShoppingCart.Tests
 
     internal class PromotionSource
     {
-        private List<IPromotion> promotions; 
+        private List<IPromotion> promotions;
 
         public PromotionSource(List<IPromotion> promotions)
         {
@@ -127,22 +127,27 @@ namespace ShoppingCart.Tests
     {
         private Dictionary<Item, int> items;
 
-        public Order(Dictionary<Item, int> items)
+        public Order(Dictionary<Item, int> items, PromotionSource promotionSource)
         {
             this.items = items;
+            var promotions = promotionSource.Promotions;
+            foreach (var promotion in promotions)
+            {
+                promotion.Apply(this);
+            }
         }
 
-        public int Total => items.Keys.Aggregate(0,(t,i)=>t+=i.Price*items[i]);
+        public int Total => items.Keys.Aggregate(0, (t, i) => t += i.Price * items[i]);
 
         internal void ApplyPromotions(PromotionSource promotionSource)
         {
-            var promotions = promotionSource.Promotions;
+
         }
     }
 
     internal class ItemSource
     {
-        private Dictionary<string,Item> items;
+        private Dictionary<string, Item> items;
 
         public ItemSource(List<Item> list)
         {
