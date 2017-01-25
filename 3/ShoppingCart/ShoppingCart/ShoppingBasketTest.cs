@@ -7,26 +7,27 @@ using System.Threading.Tasks;
 
 namespace ShoppingCart
 {
-    public class Class1
+    public class ShoppingBasketTest
     {
+        private static Item sku1 = new Item(50);
+        private static Item sku2 = new Item(70);
+        private static Item sku3 = new Item(4);
+
         [Test]
         public void AddItemCheckTotal()
         {
-            var item1 = new Item("sku1", 50);
             var basket = new Basket();
-            basket = basket.AddItem(item1);
+            basket = basket.AddItem(sku1);
             Assert.That(basket.Total, Is.EqualTo(50));
         }
 
         [Test]
         public void AddMultipleItemsCheckTotal()
         {
-            var item1 = new Item("sku1", 50);
-            var item2 = new Item("sku2", 70);
             var basket = new Basket();
             basket = basket
-                .AddItem(item1)
-                .AddItem(item2);
+                .AddItem(sku1)
+                .AddItem(sku2);
 
             Assert.That(basket.Total, Is.EqualTo(120));
         }
@@ -34,14 +35,11 @@ namespace ShoppingCart
         [Test]
         public void AddItemsOnPromotion()
         {
-            var item1 = new Item("sku1", 50);
-            var item2 = new Item("sku2", 70);
-
-            var promo = new Promotion(item1, 3, 100);
+            var promo = new Promotion(sku1, 3, 100);
             var basket = new Basket();
             basket = basket
                 .AddPromotion(promo)
-                .AddItem(item1,3);
+                .AddItem(sku1, 3);
 
             Assert.That(basket.Total, Is.EqualTo(100));
         }
@@ -49,17 +47,14 @@ namespace ShoppingCart
         [Test]
         public void AddMultipleItemsOnPromotion()
         {
-            var item1 = new Item("sku1", 50);
-            var item2 = new Item("sku2", 70);
-
-            var promo = new Promotion(item1, 3, 100);
-            var promo2 = new Promotion(item2, 3, 140);
+            var promo = new Promotion(sku1, 3, 100);
+            var promo2 = new Promotion(sku2, 3, 140);
             var basket = new Basket();
             basket = basket
                 .AddPromotion(promo)
                 .AddPromotion(promo2)
-                .AddItem(item1, 3)
-                .AddItem(item2,3);
+                .AddItem(sku1, 3)
+                .AddItem(sku2, 3);
 
             Assert.That(basket.Total, Is.EqualTo(240));
         }
@@ -67,21 +62,17 @@ namespace ShoppingCart
         [Test]
         public void AddMultipleItemsOnPromotionAndSomeOff()
         {
-            var item1 = new Item("sku1", 50);
-            var item2 = new Item("sku2", 70);
-            var item3 = new Item("sku3", 4);
-
-            var promo = new Promotion(item1, 3, 100);
-            var promo2 = new Promotion(item2, 3, 140);
+            var promo = new Promotion(sku1, 3, 100);
+            var promo2 = new Promotion(sku2, 3, 140);
             var basket = new Basket();
             basket = basket
                 .AddPromotion(promo)
                 .AddPromotion(promo2)
-                .AddItem(item1, 4)
-                .AddItem(item2, 4)
-                .AddItem(item3);
+                .AddItem(sku1, 4)
+                .AddItem(sku2, 4)
+                .AddItem(sku3);
 
-            Assert.That(basket.Total, Is.EqualTo(150+210+4));
+            Assert.That(basket.Total, Is.EqualTo(150 + 210 + 4));
         }
     }
 
@@ -97,8 +88,8 @@ namespace ShoppingCart
             {
                 if (promotions.ContainsKey(item))
                 {
-                    var promotion = promotions[item];
-                    runningTotal += promotion.Apply(items[item]);
+
+                    runningTotal += promotions[item].Apply(items[item]);
                 }
                 else
                 {
@@ -148,23 +139,17 @@ namespace ShoppingCart
 
             return basket;
         }
-
-    
     }
 
     internal class Item
     {
-        private string sku;
         private int price;
 
-        public Item(string sku, int price)
+        public Item(int price)
         {
-            this.sku = sku;
             this.price = price;
         }
 
         public int Price => price;
-
-        public object Sku => sku;
     }
 }
