@@ -12,7 +12,6 @@ namespace ShoppingCart.Tests
     public class Class1
     {
         private const string Sku1 = "sku1";
-
         private const string Sku2 = "sku2";
 
         [Test]
@@ -41,11 +40,14 @@ namespace ShoppingCart.Tests
             var item1 = new Item(Sku1, 30);
             var item2 = new Item(Sku2, 50);
             var promotion = new Promotion(item1, 3, 70);
-            var basket = new Basket();
-            basket = basket.AddPromotion(promotion);
-            basket = basket.ScanItem(item1);
-            basket = basket.ScanItem(item1);
-            basket = basket.ScanItem(item1);
+            var basket = new Basket();          
+
+            basket = basket
+                .AddPromotion(promotion)
+                .ScanItem(item1)
+                .ScanItem(item1)
+                .ScanItem(item1);
+
             Assert.That(basket.Total, Is.EqualTo(70));
         }
     }
