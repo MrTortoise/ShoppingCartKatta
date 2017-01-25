@@ -34,30 +34,99 @@ namespace ShoppingCart.Tests
             basket = basket.ScanItem(item2);
             Assert.That(basket.Total, Is.EqualTo(80));
         }
+
+        [Test]
+        public void ScanItemsWithPromotionGetTotal()
+        {
+            var item1 = new Item(Sku1, 30);
+            var item2 = new Item(Sku2, 50);
+            var promotion = new Promotion(item1, 3, 70);
+            var basket = new Basket();
+            basket = basket.AddPromotion(promotion);
+            basket = basket.ScanItem(item1);
+            basket = basket.ScanItem(item1);
+            basket = basket.ScanItem(item1);
+            Assert.That(basket.Total, Is.EqualTo(70));
+        }
     }
+
+    internal class Promotion
+    {
+        private Item item;
+        private int threshold;
+        private int price;
+
+        public Item Item => item;
+
+        public Promotion(Item item, int quantity, int price)
+        {
+            this.item = item;
+            this.threshold = quantity;
+            this.price = price;
+        }
+
+        internal int Apply(int quantity)
+        {
+            if (quantity>=threshold)
+            {
+                int rem = quantity - threshold;
+                return price + rem * item.Price;
+            }
+
+            return item.Price * quantity;
+        }
+    }
+
     internal class Basket
     {
-        private List<Item> items;
+        private Dictionary<Item, int> items = new Dictionary<Item, int>();
+        private Promotion promotion;
 
         public Basket()
         {
-            items = new List<Item>();
+            
         }
 
-        public Basket(IEnumerable<Item> items,Item item) : this()
+        private Basket(Basket basket)
         {
-            this.items.AddRange(items);
-            this.items.Add(item);
+            this.promotion = basket.promotion;
+            items = new Dictionary<Item, int>(basket.items);         
+        }
+
+        internal Basket AddPromotion(Promotion promotion)
+        {
+            var basket = new Basket(this);
+            basket.promotion = promotion;
+            return basket;
         }
 
         internal Basket ScanItem(Item item)
         {
-            return new Basket(items, item);            
+            var basket =  new Basket(this);
+            if (!basket.items.ContainsKey(item))
+            {
+                basket.items.Add(item, 0);
+            }
+            basket.items[item]++;
+            return basket;
         }
 
         internal int Total()
         {
-            return items.Sum(i => i.Price);
+            int runningTotal = 0;
+            foreach(var item in items.Keys)
+            {
+                if (promotion != null && promotion.Item.Sku == item.Sku)
+                {
+                    runningTotal = promotion.Apply(items[item]);
+                }
+                else
+                {
+                    runningTotal += item.Price * items[item];
+                }
+            }
+
+            return runningTotal;
         }
     }
 }
