@@ -22,7 +22,7 @@ namespace ShoppingCart.Tests
         [Test]
         public void ScanAnOrderGetAPrice()
         {
-            var thing = new Thing(itemSource);
+            var thing = new Thing(itemSource, new PromotionSource(new List<IPromotion>()));
             thing.Scan(Sku1);
             var order = thing.CheckOut();
             Assert.That(order.Total, Is.EqualTo(10));
@@ -31,27 +31,85 @@ namespace ShoppingCart.Tests
         [Test]
         public void ScanOrdersGetAPrice()
         {
-            var thing = new Thing(itemSource);
+            var thing = new Thing(itemSource, new PromotionSource(new List<IPromotion>()));
             thing.Scan(Sku1);
             thing.Scan(Sku2);
             var order = thing.CheckOut();
             Assert.That(order.Total, Is.EqualTo(31));
         }
+
+        [Test]
+        public void ScanOrdersGetAPriceApplyAPromotion()
+        {
+            var promotionSource = new PromotionSource(new List<IPromotion>()
+            {
+                new BuyXGetY(itemSource.GetItemFromSku(Sku1),3,1)
+            });
+            var thing = new Thing(itemSource,promotionSource);
+            thing.Scan(Sku1);
+            thing.Scan(Sku1);
+            thing.Scan(Sku1);
+            thing.Scan(Sku1);
+            thing.Scan(Sku2);
+            var order = thing.CheckOut();
+            Assert.That(order.Total, Is.EqualTo(51));
+        }
+
+
+}
+    internal class BuyXGetY : IPromotion
+    {
+        private Item item;
+        private int x;
+        private int y;
+
+        public BuyXGetY(Item item, int x, int y)
+        {
+            this.item = item;
+            this.x = x;
+            this.y = y;
+        }
+
+        public void Apply(Order order)
+        {
+           
+        }
+    }
+    internal interface IPromotion
+    {
+        void Apply(Order order);
+    }
+
+    internal class PromotionSource
+    {
+        private List<IPromotion> promotions; 
+
+        public PromotionSource(List<IPromotion> promotions)
+        {
+            this.promotions = promotions;
+        }
+
+        public List<IPromotion> Promotions => promotions;
     }
 
     internal class Thing
     {
         private Dictionary<Item, int> items = new Dictionary<Item, int>();
         private ItemSource itemSource;
+        private PromotionSource promotionSource;
 
-        public Thing(ItemSource itemSource)
+        public Thing(ItemSource itemSource, PromotionSource promotionSource)
         {
             this.itemSource = itemSource;
+            this.promotionSource = promotionSource;
         }
 
         internal Order CheckOut()
         {
-            return new Order(items);
+            var order = new Order(items);
+            order.ApplyPromotions(promotionSource);
+
+            return order;
         }
 
         internal void Scan(string sku)
@@ -75,6 +133,11 @@ namespace ShoppingCart.Tests
         }
 
         public int Total => items.Keys.Aggregate(0,(t,i)=>t+=i.Price*items[i]);
+
+        internal void ApplyPromotions(PromotionSource promotionSource)
+        {
+            var promotions = promotionSource.Promotions;
+        }
     }
 
     internal class ItemSource
