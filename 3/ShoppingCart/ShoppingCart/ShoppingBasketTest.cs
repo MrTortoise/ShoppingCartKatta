@@ -83,23 +83,22 @@ namespace ShoppingCart
 
         public int Total()
         {
-            int runningTotal = 0;
-            foreach (var item in items.Keys)
-            {
-                if (promotions.ContainsKey(item))
-                {
-
-                    runningTotal += promotions[item].Apply(items[item]);
-                }
-                else
-                {
-                    runningTotal += item.Price * items[item];
-                }
-            }
-
-            return runningTotal;
+            int total = items.Keys.Aggregate(0, (acc, item) => acc += SubTotal(item));
+            return total;            
         }
 
+        private int SubTotal(Item item)
+        {
+            if (promotions.ContainsKey(item))
+            {
+
+                return promotions[item].Apply(items[item]);
+            }
+            else
+            {
+                return item.Price * items[item];
+            } 
+        }
 
         public Basket()
         {
